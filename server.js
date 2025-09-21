@@ -10,16 +10,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// allow cors requests from any origin and with credentials
-app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: true }));
+// **CORS BEFORE ROUTES**
+app.use(cors({ origin: true, credentials: true }));
 
-// api routes
+
+// register routes AFTER cors
 app.use('/accounts', require('./accounts/accounts.controller'));
+app.use('/employees', require('./employees/employee.controller'));
+app.use('/departments', require('./departments/department.controller'));
+app.use('/requests', require('./requests/requests.controller'));
+app.use('/request-items', require('./requests/requestItem.controller'));
 
-// swagger docs route
+
+// swagger, error handler
 app.use('/api-docs', require('_helpers/swagger'));
-
-// global error handler
 app.use(errorHandler);
 
 // start server

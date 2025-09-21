@@ -19,8 +19,17 @@ router.get('/:id', ...authorize(), getById);
 router.post('/', ...authorize(Role.Admin), createSchema, create);
 router.put('/:id', ...authorize(), updateSchema, update);
 router.delete('/:id', ...authorize(), _delete);
+router.put('/:id/status', updateStatus);
+
 
 module.exports = router;
+
+function updateStatus(req, res, next) {
+  accountService.updateStatus(req.params.id, req.body.status)
+    .then(() => res.json({ message: 'Status updated successfully' }))
+    .catch(next);
+}
+
 
 function authenticateSchema(req, res, next) {
   const schema = Joi.object({
@@ -75,6 +84,7 @@ function revokeTokenSchema(req, res, next) {
       .catch(next);
   }
   
+  const Joi = require('joi');
   function registerSchema(req, res, next) {
     const schema = Joi.object({
       title: Joi.string().valid('Mr', 'Mrs', 'Miss', 'Ms'),

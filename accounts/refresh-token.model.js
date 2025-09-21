@@ -26,8 +26,7 @@ function model(sequelize) {
     timestamps: false
   };
   console.log("Defining model:", 'account' ,'refreshToken');
-  const Model = sequelize.define('...', attributes, options);
+  const Model = sequelize.define('refreshToken', attributes, options);
   console.log("Model defined:", Model);
   return Model;
-  return sequelize.define('refreshToken', attributes, options);
 }

@@ -1,16 +1,21 @@
-const { DataTypes, Sequalize } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = model;
 
 function model(sequelize) {
   const attributes = {
-    email: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
     passwordHash: { type: DataTypes.STRING, allowNull: false },
     title: { type: DataTypes.STRING, allowNull: false },
     firstName: { type: DataTypes.STRING, allowNull: false },
     lastName: { type: DataTypes.STRING, allowNull: false },
     acceptTerms: { type: DataTypes.BOOLEAN },
-    role: { type: DataTypes.STRING, allowNull: false },
+    role: { 
+      type: DataTypes.STRING, 
+      allowNull: false, 
+      defaultValue: 'User' // default role for new registrations
+    },
+    status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'Active' },
     verificationToken: { type: DataTypes.STRING },
     verified: { type: DataTypes.DATE },
     resetToken: { type: DataTypes.STRING },
@@ -23,22 +28,20 @@ function model(sequelize) {
       get() { return !!(this.verified || this.passwordReset); }
     }
   };
+
   const options = {
-    // disable default timestamp fields (createdAt and updatedAt)
     timestamps: false,
     defaultScope: {
-      // exclude password hash by default
-      attributes: { exclude: ['passwordHash'] }
+      attributes: { exclude: ['passwordHash'] } // hide password hash by default
     },
     scopes: {
-      // include hash with this scope
-      withHash: { attributes: {} }
+      withHash: { attributes: {} } // include hash when needed
     }
-    
   };
-  console.log("Defining model:", 'account','refreshToken');
-const Model = sequelize.define('...', attributes, options);
-console.log("Model defined:", Model);
-return Model;
-  return sequelize.define('account', attributes, options);
-}  
+
+  console.log("Defining model:", 'account');
+  const Model = sequelize.define('account', attributes, options);
+  console.log("Model defined:", Model);
+
+  return Model;
+}

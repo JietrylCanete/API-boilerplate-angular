@@ -1,28 +1,52 @@
-const config = require('config.json');
-const mysql = require('mysql2/promise');
+// _helpers/db.js
 const { Sequelize } = require('sequelize');
+const config = require('config.json');
 
-module.exports = db = {};
+// Use the properties inside config.database
+const sequelize = new Sequelize(
+  config.database.database,   // Database name as string
+  config.database.user,       // DB username
+  config.database.password,   // DB password
+  {
+    host: config.database.host,
+    port: config.database.port, // optional, default is 3306
+    dialect: 'mysql',
+    logging: false
+  }
+);
 
-initialize();
 
-async function initialize() {
-  // create db if it doesn't already exist
-  const { host, port, user, password, database } = config.database;
-  const connection = await mysql.createConnection({ host, port, user, password });
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+const db = {};
 
-  // connect to db
-  const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+// Models
+db.Account = require('../accounts/account.model')(sequelize);
+db.Employee = require('../employees/employee.model')(sequelize);
+db.Department = require('../departments/department.model')(sequelize);
+db.Request = require('../requests/request.model')(sequelize);
+db.RequestItem = require('../requests/requestItem.model')(sequelize);
+db.RefreshToken = require('../accounts/refresh-token.model')(sequelize);
 
-  // init models and add them to the exported db object
-  db.Account = require('../accounts/account.model')(sequelize);
-  db.RefreshToken = require('../accounts/refresh-token.model')(sequelize);
+// Associations
+db.Employee.belongsTo(db.Department, { foreignKey: 'departmentId' });
+db.Request.belongsTo(db.Employee, { foreignKey: 'employeeId', as: 'employee' });
+db.Request.hasMany(db.RequestItem, { foreignKey: 'requestId', as: 'items' });
+db.RefreshToken.belongsTo(db.Account, { foreignKey: 'accountId' });
 
-  // define relationships
-  db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
-  db.RefreshToken.belongsTo(db.Account);
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-  // sync all models with database
-  await sequelize.sync({ alter: true });
-}
+// Sync DB (update tables to match models)
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connected successfully.');
+    
+    // ALTER tables to match models without dropping data
+    await sequelize.sync({ alter: true });
+    console.log('All models were synchronized successfully.');
+  } catch (err) {
+    console.error('Unable to connect to the database:', err);
+  }
+})();
+
+module.exports = db;

@@ -23,13 +23,26 @@ module.exports = {
   getById,
   create,
   update,
-  delete: _delete
+  delete: _delete,
+  updateStatus,
 };
+async function updateStatus(id, status) {
+  const account = await getAccount(id);
+  account.status = status;
+  await account.save();
+}
+
+
 async function authenticate({ email, password, ipAddress }) {
     const account = await db.Account.scope('withHash').findOne({ where: { email } });
   
     if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
       throw 'Email or password is incorrect';
+    }
+
+    //if account is inactive, prevent login
+    if (account.status === 'Inactive') {
+        throw 'Account inactive. Contact admin.';
     }
   
     // authentication successful so generate jwt and refresh tokens
@@ -46,6 +59,26 @@ async function authenticate({ email, password, ipAddress }) {
       refreshToken: refreshToken.token
     };
   }
+ 
+ /*   //for test purpose, skip the isVerified check <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ async function authenticate({ email, password }) {
+    const account = await db.Account.scope('withHash').findOne({ where: { email } });
+
+    if (!account || !(bcrypt.compareSync(password, account.passwordHash))) {
+        throw 'Email or password is incorrect';
+    }
+
+    // ⬇️ Skip the "account not verified" check
+    // if (!account.verified) {
+    //     throw 'Account not verified';
+    // }
+
+    // authentication successful
+    const token = generateJwtToken(account);
+    return { ...basicDetails(account), token };
+}
+*/
+
   async function refreshToken({ token, ipAddress }) {
     const refreshToken = await getRefreshToken(token);
     const account = await refreshToken.getAccount();
@@ -84,8 +117,11 @@ async function authenticate({ email, password, ipAddress }) {
     }
   
     // create account object
-    const account = new db.Account(params);
-  
+    const account = new db.Account({
+      ...params,
+      status: 'Active'   //default active
+    });
+
     // first registered account is an admin
     const isFirstAccount = (await db.Account.count()) === 0;
     account.role = isFirstAccount ? Role.Admin : Role.User;
@@ -100,6 +136,39 @@ async function authenticate({ email, password, ipAddress }) {
     // send email
     await sendVerificationEmail(account, origin);
   }
+   /* 
+   //for test purpose <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  async function register(params, origin) {
+    // Check if email is already registered
+    if (await db.Account.findOne({ where: { email: params.email } })) {
+        throw 'Email "' + params.email + '" is already registered';
+    }
+
+    // First registered account is Admin, rest are Users
+    const isFirstAccount = (await db.Account.count()) === 0;
+
+    // Create account object
+    const account = new db.Account({
+        ...params,
+        role: isFirstAccount ? Role.Admin : Role.User,
+        status: 'Active', // default
+        verificationToken: randomTokenString()
+    });
+
+    // Hash password
+    account.passwordHash = await bcrypt.hash(params.password, 10);
+
+    // Save account
+    await account.save();
+
+    // Send verification email
+    await sendVerificationEmail(account, origin);
+
+    // Return account details (without passwordHash)
+    return basicDetails(account);
+}*/
+
+
   async function verifyEmail({ token }) {
     const account = await db.Account.findOne({ where: { verificationToken: token } });
   
@@ -162,10 +231,13 @@ async function authenticate({ email, password, ipAddress }) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
       throw `Email "${params.email}" is already registered`;
     }
-  
-    const account = new db.Account(params);
-    account.verified = Date.now();
-  
+    
+    const account = new db.Account({
+      ...params,
+      verified: Date.now(),
+      status: 'Active'   //default active
+    });
+
     // hash password
     account.passwordHash = await hash(params.password);
   
@@ -237,8 +309,8 @@ async function getAccount(id) {
   }
   
   function basicDetails(account) {
-    const { id, title, firstName, lastName, email, role, created, updated, isVerified } = account;
-    return { id, title, firstName, lastName, email, role, created, updated, isVerified };
+    const { id, title, firstName, lastName, email, role, status, created, updated, isVerified } = account;
+    return { id, title, firstName, lastName, email, role, status, created, updated, isVerified };
   }
 
   async function sendVerificationEmail(account, origin) {
@@ -260,6 +332,7 @@ async function getAccount(id) {
              ${message}
              <p>Thanks for registering!</p>`
     });
+    
   }
   
   async function sendAlreadyRegisteredEmail(email, origin) {
