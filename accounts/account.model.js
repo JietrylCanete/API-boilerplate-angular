@@ -4,6 +4,11 @@ module.exports = model;
 
 function model(sequelize) {
   const attributes = {
+    id: { 
+      type: DataTypes.INTEGER, 
+      autoIncrement: true, 
+      primaryKey: true 
+    },
     email: { type: DataTypes.STRING, allowNull: false, unique: true },
     passwordHash: { type: DataTypes.STRING, allowNull: false },
     title: { type: DataTypes.STRING, allowNull: false },
@@ -13,9 +18,9 @@ function model(sequelize) {
     role: { 
       type: DataTypes.STRING, 
       allowNull: false, 
-      defaultValue: 'User' // default role for new registrations
+      defaultValue: 'User'
     },
-    status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'Active' },
+    status: { type: DataTypes.ENUM('Active', 'Inactive'), allowNull: false, defaultValue: 'Active' },
     verificationToken: { type: DataTypes.STRING },
     verified: { type: DataTypes.DATE },
     resetToken: { type: DataTypes.STRING },
@@ -32,16 +37,12 @@ function model(sequelize) {
   const options = {
     timestamps: false,
     defaultScope: {
-      attributes: { exclude: ['passwordHash'] } // hide password hash by default
+      attributes: { exclude: ['passwordHash'] }
     },
     scopes: {
-      withHash: { attributes: {} } // include hash when needed
+      withHash: { attributes: {} }
     }
   };
 
-  console.log("Defining model:", 'account');
-  const Model = sequelize.define('account', attributes, options);
-  console.log("Model defined:", Model);
-
-  return Model;
+  return sequelize.define('Account', attributes, options);
 }
