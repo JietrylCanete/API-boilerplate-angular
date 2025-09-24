@@ -7,6 +7,7 @@ import { RegisterComponent } from './register.component';
 import { VerifyEmailComponent } from './verify-email.component';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { ResetPasswordComponent } from './reset-password.component';
+import { AuthGuard } from '@app/_helpers'; // protect the route
 
 const routes: Routes = [
     {
@@ -16,7 +17,11 @@ const routes: Routes = [
             { path: 'register', component: RegisterComponent },
             { path: 'verify-email', component: VerifyEmailComponent },
             { path: 'forgot-password', component: ForgotPasswordComponent },
-            { path: 'reset-password', component: ResetPasswordComponent }
+            { path: 'reset-password', component: ResetPasswordComponent },
+          //  { path: 'list', component: AccountListComponent },
+            
+            
+             // NEW route
         ]
     }
 ];

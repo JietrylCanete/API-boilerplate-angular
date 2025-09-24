@@ -1,20 +1,23 @@
 ﻿<div class="app-container" [ngClass]="{ 'bg-light': account }">
-    <!-- main nav -->
     <nav class="navbar navbar-expand navbar-dark bg-dark px-3" *ngIf="account">
-        <div class="navbar-nav">
-            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item nav-link">Home</a>
-            <a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link">Profile</a>
-            <a *ngIf="account.role === Role.Admin" routerLink="/admin" routerLinkActive="active" class="nav-item nav-link">Admin</a>
-            <button (click)="logout()" class="btn btn-link nav-item nav-link">Logout</button>
+        <div class="container-fluid">
+            <a routerLink="/" class="navbar-brand">IPT Final (Prototype)</a>
+
+            <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-2">
+                <a routerLink="/admin/accounts" class="nav-item nav-link">Accounts</a>
+                <a routerLink="/employee/list" class="nav-item nav-link">Employees</a>
+                <a routerLink="/department/list" class="nav-item nav-link">Departments</a>
+                <a routerLink="/request/list" class="nav-item nav-link">Requests</a>
+            </div>
+
+            <button (click)="logout()" class="btn btn-link nav-item nav-link text-white ms-3">Logout</button>
         </div>
     </nav>
+    <div class="px-4 py-5 my-5 text-center">
+        <router-outlet name="subnav"></router-outlet>
 
-    <!-- subnav router outlet -->
-    <router-outlet name="subnav"></router-outlet>
+        <alert></alert>
 
-    <!-- global alert -->
-    <alert></alert>
-
-    <!-- main router outlet -->
-    <router-outlet></router-outlet>
+        <router-outlet></router-outlet>
+    </div>
 </div>

@@ -1,0 +1,44 @@
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>{{ isAddMode ? "Add Department" : "Edit Department" }}</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input
+          type="text"
+          formControlName="name"
+          class="form-control"
+          [ngClass]="{ 'is-invalid': submitted && f['name'].errors }"
+        />
+        <div *ngIf="submitted && f['name'].errors" class="invalid-feedback">
+          <div *ngIf="f['name'].errors['required']">
+            Department name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea
+          formControlName="description"
+          class="form-control"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select formControlName="status" class="form-select">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <button [disabled]="submitting" class="btn btn-primary">
+        {{ submitting ? "Saving..." : "Save" }}
+      </button>
+      <a routerLink="../" class="btn btn-link">Cancel</a>
+    </form>
+  </div>
+</div>

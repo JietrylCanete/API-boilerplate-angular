@@ -1,0 +1,76 @@
+/* Styling for the card header */
+.card-header {
+    font-weight: bold;
+    font-size: 1.25rem; /* Adjust as needed */
+    color: #343a40; /* Darker color for the header text */
+    background-color: #f8f9fa; /* Light grey background for header */
+    border-bottom: 1px solid #dee2e6; /* Standard card header border */
+    padding: 0.75rem 1.25rem; /* Standard Bootstrap card-header padding */
+}
+
+/* Specific styling for the badges to ensure proper appearance */
+.badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    display: inline-block; /* Ensure badges behave correctly */
+}
+
+/* Bootstrap classes for badge colors */
+.badge.bg-success {
+    background-color: #28a745 !important; /* Bootstrap success green */
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important; /* Bootstrap danger red */
+}
+
+/* General table styling, ensuring good spacing */
+.table {
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.table th, .table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Custom button styling if you want to override default Bootstrap or ensure consistency */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Ensure consistent margin for the edit button */
+.btn-sm.me-1 {
+    margin-right: 0.25rem !important;
+}
+
+/* Flex utilities for button alignment */
+.d-flex {
+    display: flex !important;
+}
+.justify-content-end {
+    justify-content: flex-end !important;
+}
+.mt-3 {
+    margin-top: 1rem !important;
+}

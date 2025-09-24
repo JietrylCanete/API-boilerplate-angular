@@ -10,6 +10,7 @@ import { VerifyEmailComponent } from './verify-email.component';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { ResetPasswordComponent } from './reset-password.component';
 
+
 @NgModule({
     imports: [
         CommonModule,
@@ -22,7 +23,8 @@ import { ResetPasswordComponent } from './reset-password.component';
         RegisterComponent,
         VerifyEmailComponent,
         ForgotPasswordComponent,
-        ResetPasswordComponent
+        
+        ResetPasswordComponent,
     ]
 })
 export class AccountModule { }

@@ -32,23 +32,29 @@ export class AddEditComponent implements OnInit {
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             role: ['', Validators.required],
-            // password only required in add mode
+            // password required only in add mode
             password: ['', [Validators.minLength(6), ...(!this.id ? [Validators.required] : [])]],
             confirmPassword: ['']
         }, {
             validator: MustMatch('password', 'confirmPassword')
         });
 
-        this.title = 'Create Account';
+        this.title = this.id ? 'Edit Account' : 'Create Account';
+
         if (this.id) {
             // edit mode
-            this.title = 'Edit Account';
             this.loading = true;
-            this.accountService.getById(this.id)
+            this.accountService.getById(Number(this.id))
                 .pipe(first())
-                .subscribe(x => {
-                    this.form.patchValue(x);
-                    this.loading = false;
+                .subscribe({
+                    next: (account) => {
+                        this.form.patchValue(account);
+                        this.loading = false;
+                    },
+                    error: (error) => {
+                        this.alertService.error(error);
+                        this.loading = false;
+                    }
                 });
         }
     }
@@ -57,40 +63,30 @@ export class AddEditComponent implements OnInit {
     get f() { return this.form.controls; }
 
     onSubmit() {
-        this.submitted = true;
+    this.submitted = true;
+    this.alertService.clear();
 
-        // reset alerts on submit
-        this.alertService.clear();
+    if (this.form.invalid) return;
 
-        // stop here if form is invalid
-        if (this.form.invalid) {
-            return;
-        }
+    this.submitting = true;
 
-        this.submitting = true;
+    const saveAccount = this.id
+        ? () => this.accountService.update(Number(this.id), this.form.value)
+        : () => this.accountService.create(this.form.value); // This still points to /accounts
 
-        // create or update account based on id param
-        let saveAccount;
-        let message: string;
-        if (this.id) {
-            saveAccount = () => this.accountService.update(this.id!, this.form.value);
-            message = 'Account updated';
-        } else {
-            saveAccount = () => this.accountService.create(this.form.value);
-            message = 'Account created';
-        }
+    const message = this.id ? 'Account updated' : 'Account created';
 
-        saveAccount()
-            .pipe(first())
-            .subscribe({
-                next: () => {
-                    this.alertService.success(message, { keepAfterRouteChange: true });
-                    this.router.navigateByUrl('/admin/accounts');
-                },
-                error: error => {
-                    this.alertService.error(error);
-                    this.submitting = false;
-                }
-            });
-    }
+    saveAccount()
+        .pipe(first())
+        .subscribe({
+            next: () => {
+                this.alertService.success(message, { keepAfterRouteChange: true });
+                this.router.navigateByUrl('/admin/accounts');
+            },
+            error: (error) => {
+                this.alertService.error(error);
+                this.submitting = false;
+            }
+        });
+}
 }

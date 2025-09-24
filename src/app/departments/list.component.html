@@ -1,0 +1,39 @@
+<div class="card m-3">
+    <h5 class="card-header">DEPARTMENTS</h5>
+    <div class="card-body">
+        <div *ngIf="!loading; else loadingTemplate">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 25%">Name</th>
+                        <th style="width: 40%">Description</th>
+                        <th style="width: 15%">Employee Count</th>
+                        <th style="width: 20%">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let department of departments">
+                        <td>{{department.name}}</td>
+                        <td>{{department.description}}</td>
+                        <td>{{department.employeeCount}}</td>
+                        <td style="white-space: nowrap">
+                            <a routerLink="edit/{{department.id}}" class="btn btn-sm btn-primary me-1">Edit</a>
+                            </td>
+                    </tr>
+                    <tr *ngIf="departments.length === 0">
+                        <td colspan="4" class="text-center p-3">No Departments to display</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <ng-template #loadingTemplate>
+            <div class="text-center p-3">
+                <span class="spinner-border spinner-border-lg align-middle me-2"></span>
+                Loading departments...
+            </div>
+        </ng-template>
+        <div class="d-flex justify-content-end mt-3">
+            <a routerLink="add" class="btn btn-primary">Add Department</a>
+        </div>
+    </div>
+</div>

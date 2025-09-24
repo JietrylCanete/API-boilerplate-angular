@@ -1,0 +1,17 @@
+<h2>Departments</h2>
+<table *ngIf="!loading" border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let dep of departments">
+      <td>{{ dep.name }}</td>
+      <td>{{ dep.description }}</td>
+      <td>{{ dep.status }}</td>
+    </tr>
+  </tbody>
+</table>
